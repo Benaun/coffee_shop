@@ -1,7 +1,76 @@
-import { Controller } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  Req,
+  Res,
+  UnauthorizedException,
+  UsePipes,
+  ValidationPipe,
+} from "@nestjs/common";
 import { AuthService } from "./auth.service";
+import { RefreshTokenService } from "./refresh-token.service";
+import { AuthDto } from "./dto/auth.dto";
+import { Request, Response } from "express";
 
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly refreshTokenService: RefreshTokenService,
+  ) {}
+
+  @UsePipes(new ValidationPipe())
+  @HttpCode(200)
+  @Post("auth/login")
+  async login(@Body() dto: AuthDto, @Res({ passthrough: true }) res: Response) {
+    const { refreshToken, ...response } = await this.authService.login(dto);
+
+    this.refreshTokenService.addRefreshTokenToResponse(res, refreshToken);
+
+    return response;
+  }
+
+  @UsePipes(new ValidationPipe())
+  @HttpCode(200)
+  @Post("auth/register")
+  async register(
+    @Body() dto: AuthDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { refreshToken, ...response } = await this.authService.register(dto);
+    this.refreshTokenService.addRefreshTokenToResponse(res, refreshToken);
+    return response;
+  }
+
+  @UsePipes(new ValidationPipe())
+  @HttpCode(200)
+  @Post("auth/access-token")
+  async getNewTokens(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshTokenFormCookies =
+      req.cookies[this.refreshTokenService.REFRESH_TOKEN_NAME];
+
+    if (!refreshTokenFormCookies) {
+      this.refreshTokenService.removeRefreshTokenFromResponse(res);
+      throw new UnauthorizedException("No refresh token");
+    }
+
+    const { refreshToken, ...response } = await this.authService.getNewTokens(
+      refreshTokenFormCookies,
+    );
+
+    this.refreshTokenService.addRefreshTokenToResponse(res, refreshToken);
+    return response;
+  }
+
+  @HttpCode(200)
+  @Post("auth/logout")
+  async logout(@Res({ passthrough: true }) res: Response) {
+    this.refreshTokenService.removeRefreshTokenFromResponse(res);
+    return true;
+  }
 }
