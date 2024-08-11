@@ -20,7 +20,7 @@ model User {
 
   verifToken String? @default(cuid()) @map("verif_token")
 
-  role Role[] @default([CUSTOMER])
+  role Role[] @default([USER])
 
   orders Order[]
 
@@ -88,7 +88,7 @@ model OrderItem {
 }
 
 enum Role {
-  CUSTOMER
+  USER
   ADMIN
   MANAGER
 }

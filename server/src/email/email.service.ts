@@ -1,7 +1,7 @@
-import { MailerService } from '@nestjs-modules/mailer';
-import { Injectable } from '@nestjs/common';
-import { render } from '@react-email/render';
-import ConfirmMail from 'mail/confirm-mail';
+import { MailerService } from "@nestjs-modules/mailer";
+import { Injectable } from "@nestjs/common";
+import { render } from "@react-email/render";
+import ConfirmMail from "mail/confirm-mail";
 
 @Injectable()
 export class EmailService {
@@ -17,6 +17,6 @@ export class EmailService {
 
   sendVerification(to: string, verifLink: string) {
     const html = render(ConfirmMail({ url: verifLink }));
-    return this.sendEmail(to, 'Подтверждение почты', html);
+    return this.sendEmail(to, "Подтверждение почты", html);
   }
 }
