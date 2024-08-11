@@ -13,9 +13,9 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   email    String @unique
-  name     String
+  name     String?
   password String
-  phone    String @default("")
+  phone    String
   avatar String @default("/uploads/default-avatar.png")
 
   verifToken String? @default(cuid()) @map("verif_token")
