@@ -1,4 +1,4 @@
-import { categoryObject } from "@/category/category.objext";
+import { categoryObject } from "@/category/category.object";
 import { Prisma } from "@prisma/client";
 
 export const productObject: Prisma.ProductSelect = {

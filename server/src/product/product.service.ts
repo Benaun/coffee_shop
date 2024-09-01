@@ -30,9 +30,7 @@ export class ProductService {
     await this.categoryService.getById(dto.categoryId);
 
     return this.prisma.product.update({
-      where: {
-        id,
-      },
+      where: { id },
       data: {
         title: dto.title,
         slug: generateSlug(dto.title),
@@ -50,9 +48,7 @@ export class ProductService {
 
   async delete(id: string) {
     return await this.prisma.product.delete({
-      where: {
-        id,
-      },
+      where: { id },
     });
   }
 
@@ -105,9 +101,7 @@ export class ProductService {
 
   async bySlug(slug: string) {
     const product = await this.prisma.product.findUnique({
-      where: {
-        slug,
-      },
+      where: { slug },
       select: productObject,
     });
     if (!product) throw new NotFoundException(" Такого нет ");

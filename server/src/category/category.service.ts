@@ -1,6 +1,6 @@
 import { PrismaService } from "@/prisma.service";
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { categoryObject } from "./category.objext";
+import { categoryObject } from "./category.object";
 import { CategoryDto } from "./dto/category.dto";
 import { generateSlug } from "@/assets/genSlug";
 
@@ -16,9 +16,7 @@ export class CategoryService {
 
   async getById(id: string) {
     const category = await this.prisma.category.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
       select: categoryObject,
     });
     if (!category) throw new NotFoundException(" Нет такой ");
