@@ -13,10 +13,10 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   email    String @unique
-  name     String?
+  name     String @default("User")
   password String
-  phone    String
-  avatar String @default("/uploads/default-avatar.png")
+  phone    String @default("")
+  avatar   String @default("/uploads/avatar.png")
 
   verifToken String? @default(cuid()) @map("verif_token")
 
@@ -32,13 +32,13 @@ model Product {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  title       String
+  title       String @unique
   slug        String @unique
   description String
   price       Int
   image       String
 
-  category   Category @relation(fields: [categoryId], references: [id])
+  category   Category? @relation(fields: [categoryId], references: [id])
   categoryId String   @map("category_id")
 
   orderItems OrderItem[]
@@ -51,7 +51,10 @@ model Category {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  name    String    @unique
+  title  String  @unique
+  slug  String  @unique
+  image String?
+
   products Product[]
 
   @@map("category")
@@ -63,6 +66,7 @@ model Order {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   items OrderItem[]
+  total Int
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @map("user_id")
