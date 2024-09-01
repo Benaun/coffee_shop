@@ -3,6 +3,7 @@ import { Injectable, NotFoundException } from "@nestjs/common";
 import { productObject } from "./product.object";
 import { ProductDto } from "./dto/product.dto";
 import { generateSlug } from "@/assets/genSlug";
+import { CategoryService } from "@/category/category.service";
 
 @Injectable()
 export class ProductService {
