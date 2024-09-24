@@ -1,4 +1,3 @@
-import { EmailService } from "@/email/email.service";
 import { PrismaService } from "@/prisma.service";
 import { UserService } from "@/user/user.service";
 import {
@@ -17,7 +16,6 @@ export class AuthService {
   constructor(
     private jwt: JwtService,
     private userService: UserService,
-    private emailService: EmailService,
     private prisma: PrismaService,
   ) {}
 
@@ -63,10 +61,6 @@ export class AuthService {
     }
     const user = await this.userService.create(dto);
 
-    // await this.emailService.sendVerification(
-    //     user.email, `http://localhost:4200/verify-email?token=${user.verificationToken}`
-    // )
-
     return this.buildResponseObject(user);
   }
 
@@ -78,22 +72,6 @@ export class AuthService {
     const user = await this.userService.getById(result.id);
     return this.buildResponseObject(user);
   }
-
-  //   async verifyEmail(token: string) {
-  //     const user = await this.prisma.user.findFirst({
-  //       where: {
-  //         verifToken: token,
-  //       },
-  //     });
-
-  //     if (!user) throw new NotFoundException("Token not exists!");
-
-  //     await this.userService.update(user.id, {
-  //       verifToken: null,
-  //     });
-
-  //     return "Почта подтверждена";
-  //   }
 
   async buildResponseObject(user: User) {
     const tokens = await this.issueTokens(user.id, user.role);

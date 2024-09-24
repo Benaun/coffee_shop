@@ -18,8 +18,6 @@ model User {
   phone    String @default("")
   avatar   String @default("/uploads/avatar.png")
 
-  verifToken String? @default(cuid()) @map("verif_token")
-
   role Role[] @default([USER])
 
   orders Order[]
