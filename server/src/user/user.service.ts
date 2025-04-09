@@ -1,12 +1,15 @@
 import { AuthDto } from "@/auth/dto/auth.dto";
 import { PrismaService } from "@/prisma.service";
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { hash } from "argon2";
 import { UserDto } from "./user.dto";
+import { Prisma } from "@prisma/client";
+import { userObject } from "./user.service copy";
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  // eslint-disable-next-line prettier/prettier
+  constructor(private prisma: PrismaService) { }
 
   async getUsers() {
     return this.prisma.user.findMany({
@@ -19,20 +22,55 @@ export class UserService {
     });
   }
 
-  async getById(id: string) {
-    return this.prisma.user.findUnique({
+  async getById(id: string, selectObject: Prisma.UserSelect = {}) {
+    const user = await this.prisma.user.findUnique({
       where: {
         id,
       },
-    });
-  }
-
-  async getByEmail(email: string) {
-    return this.prisma.user.findUnique({
-      where: {
-        email,
+      select: {
+        ...userObject,
+        favorites: {
+          select: {
+            id: true,
+            title: true,
+            price: true,
+            image: true,
+            slug: true,
+            category: {
+              select: {
+                title: true,
+              },
+            },
+          },
+        },
+        ...selectObject,
       },
     });
+
+    if (!user) throw new Error("User not found");
+
+    return user;
+  }
+
+  async toggleFavorite(userId: string, productId: string) {
+    const user = await this.getById(userId);
+
+    if (!user) throw new NotFoundException("User not found");
+
+    const isExists = user.favorites.some((product) => product.id === productId);
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: {
+        favorites: {
+          [isExists ? "disconnect" : "connect"]: {
+            id: productId,
+          },
+        },
+      },
+    });
+
+    return { message: "Success" };
   }
 
   async create(dto: AuthDto) {

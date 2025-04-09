@@ -13,12 +13,12 @@ import {
 } from "@nestjs/common";
 import { ProductService } from "./product.service";
 import { Auth } from "@/auth/decorators/auth.decorator";
-import { Role } from "@prisma/client";
 import { ProductDto } from "./dto/product.dto";
 
 @Controller("products")
 export class ProductController {
-  constructor(private readonly productService: ProductService) {}
+  // eslint-disable-next-line prettier/prettier
+  constructor(private readonly productService: ProductService) { }
 
   @UsePipes(new ValidationPipe())
   @Get()
@@ -36,7 +36,7 @@ export class ProductController {
     return this.productService.byCategory(categorySlug);
   }
 
-  @Auth(Role.ADMIN)
+  @Auth()
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
   @Post()
@@ -44,7 +44,7 @@ export class ProductController {
     return this.productService.create();
   }
 
-  @Auth(Role.ADMIN)
+  @Auth()
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
   @Put(":id")
@@ -52,7 +52,7 @@ export class ProductController {
     return this.productService.update(id, dto);
   }
 
-  @Auth(Role.ADMIN)
+  @Auth()
   @HttpCode(200)
   @Delete("id")
   async deleteProduct(@Param("id") id: string) {

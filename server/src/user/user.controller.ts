@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   Param,
+  Patch,
   Put,
   UsePipes,
   ValidationPipe,
@@ -12,17 +13,27 @@ import {
 import { UserService } from "./user.service";
 import { Auth } from "@/auth/decorators/auth.decorator";
 import { CurrentUser } from "@/auth/decorators/user.decorator";
-import { Role } from "@prisma/client";
 import { UserDto } from "./user.dto";
 
 @Controller("/users")
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  // eslint-disable-next-line prettier/prettier
+  constructor(private readonly userService: UserService) { }
 
   @Auth()
   @Get("profile")
   async getProfile(@CurrentUser("id") id: string) {
     return this.userService.getById(id);
+  }
+
+  @Auth()
+  @Patch("profile/favorites/:productId")
+  @HttpCode(200)
+  async toggleFavorites(
+    @CurrentUser("id") id: string,
+    @Param("productId") productId: string,
+  ) {
+    return this.userService.toggleFavorite(id, productId);
   }
 
   @Auth()
@@ -33,13 +44,13 @@ export class UserController {
     return this.userService.update(id, dto);
   }
 
-  @Auth(Role.ADMIN)
+  @Auth()
   @Get()
   async getUsers() {
     return this.userService.getUsers();
   }
 
-  @Auth(Role.ADMIN)
+  @Auth()
   @HttpCode(200)
   @Delete(":id")
   async deleteUser(@Param("id") id: string) {

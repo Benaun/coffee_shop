@@ -11,17 +11,22 @@ import {
   ValidationPipe,
 } from "@nestjs/common";
 import { CategoryService } from "./category.service";
-import { Role } from "@prisma/client";
 import { Auth } from "@/auth/decorators/auth.decorator";
 import { CategoryDto } from "./dto/category.dto";
 
 @Controller("categories")
 export class CategoryController {
-  constructor(private readonly categoryService: CategoryService) {}
+  // eslint-disable-next-line prettier/prettier
+  constructor(private readonly categoryService: CategoryService) { }
 
   @Get()
   async getAll() {
     return this.categoryService.getAll();
+  }
+
+  @Get("by-id/:id")
+  async getById(@Param("id") id: string) {
+    return this.categoryService.getById(id);
   }
 
   @Get("by-slug/:slug")
@@ -29,14 +34,14 @@ export class CategoryController {
     return this.categoryService.getBySlug(slug);
   }
 
-  @Auth(Role.ADMIN)
+  @Auth()
   @HttpCode(200)
   @Post()
   async create() {
     return this.categoryService.create();
   }
 
-  @Auth(Role.ADMIN)
+  @Auth()
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
   @Put(":id")
@@ -44,7 +49,7 @@ export class CategoryController {
     return this.categoryService.update(id, dto);
   }
 
-  @Auth(Role.ADMIN)
+  @Auth()
   @HttpCode(200)
   @Delete(":id")
   async delete(@Param("id") id: string) {

@@ -10,7 +10,8 @@ export class ProductService {
   constructor(
     private prisma: PrismaService,
     private categoryService: CategoryService,
-  ) {}
+    // eslint-disable-next-line prettier/prettier
+  ) { }
 
   async create() {
     const product = {
@@ -27,19 +28,21 @@ export class ProductService {
   }
 
   async update(id: string, dto: ProductDto) {
-    await this.categoryService.getById(dto.categoryId);
+    const { title, description, price, categoryId, image } = dto;
+
+    await this.categoryService.getById(categoryId);
 
     return this.prisma.product.update({
       where: { id },
       data: {
-        title: dto.title,
-        slug: generateSlug(dto.title),
-        description: dto.description,
-        price: dto.price,
-        image: dto.image,
+        title,
+        description,
+        price,
+        image,
+        slug: generateSlug(title),
         category: {
           connect: {
-            id: dto.categoryId,
+            id: categoryId,
           },
         },
       },
