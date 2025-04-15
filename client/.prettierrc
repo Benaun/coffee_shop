@@ -8,7 +8,7 @@
   "arrowParens": "avoid",
   "proseWrap": "preserve",
   "htmlWhitespaceSensitivity": "strict",
-  "printWidth": 100,
+  "printWidth": 65,
   "importOrder": [
     "<THIRD_PARTY_MODULES>",
     "^@/components/(.*)$",
