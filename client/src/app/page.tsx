@@ -1,9 +1,13 @@
-import Image from "next/image";
+import { FC } from "react"
 
-export default function Home() {
+import MainContent from "@/components/main-content/main-content"
+
+const Home: FC = () => {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      hello
-    </main>
-  );
+    <div className='relative h-screen'>
+      <MainContent />
+    </div>
+  )
 }
+
+export default Home
