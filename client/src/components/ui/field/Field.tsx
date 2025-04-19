@@ -5,14 +5,12 @@ import {
   Controller,
   FieldPath,
   FieldValues,
+  PathValue,
   RegisterOptions
 } from "react-hook-form"
 
 export interface IField<T extends FieldValues>
-  extends Omit<
-    InputHTMLAttributes<HTMLInputElement>,
-    "onChange" | "onChangeText" | "value"
-  > {
+  extends InputHTMLAttributes<HTMLInputElement> {
   control: Control<T>
   name: FieldPath<T>
   rules?: Omit<
@@ -27,30 +25,47 @@ const Field = <T extends Record<string, unknown>>({
   name,
   className,
   ...rest
-}: IField<T>): JSX.Element => {
+}: IField<T>) => {
   return (
     <Controller
       control={control}
       name={name}
-      rules={rules}
+      rules={{
+        ...rules,
+        validate: (
+          value: PathValue<T, FieldPath<T>>,
+          formValues: T
+        ) => {
+          if (!value?.toString().trim() && !rules?.required)
+            return true
+
+          // Если есть кастомная валидация в rules - выполняем ее
+          if (typeof rules?.validate === "function") {
+            return rules.validate(value, formValues)
+          }
+          return true
+        }
+      }}
       render={({
         field: { value, onChange, onBlur },
-        fieldState: { error }
+        fieldState: { error, isTouched }
       }) => (
         <div className='flex flex-col items-center'>
           <input
             autoCapitalize='none'
             onChange={onChange}
             onBlur={onBlur}
-            value={(value || " ").toString()}
+            value={value?.toString() ?? ""}
             className={cn(
               "text-black text-base w-[80%] border rounded-lg pb-4 pt-2.5 px-4 my-1.5 outline-none",
-              error ? "border-red-500" : "border-gray-400",
+              error && isTouched
+                ? "border-red-500"
+                : "border-gray-400",
               className
             )}
             {...rest}
           />
-          {error && (
+          {error && isTouched && (
             <span className='text-red-500 text-sm'>
               {error.message}
             </span>
